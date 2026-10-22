@@ -1,0 +1,17 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+{% load form_tags %}
+{% block app %}
+  <section class="app-card">
+    {% include "teams/components/team_tabs.html" %}
+    <h2 class="text-xl font-bold mb-2">{% translate "Invite someone" %}</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% render_form_fields form %}
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">{% translate "Send invitation" %}</button>
+        <a href="{% url 'teams:members' request.team.slug %}" class="btn btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

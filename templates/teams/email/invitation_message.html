@@ -1,0 +1,11 @@
+{% extends 'account/email/email_template_base.html' %}
+{% load i18n %}
+{% block message_body %}
+  <p>
+    {% blocktranslate trimmed with inviter=invitation.invited_by.get_display_name team_name=team.name label=team_label|lower role=invitation.get_role_display %}
+      {{ inviter }} invited you to join the {{ label }} {{ team_name }} on {{ site_name }} with the role {{ role }}.
+    {% endblocktranslate %}
+  </p>
+{% endblock %}
+{% block cta_link %}{{ invitation_url }}{% endblock %}
+{% block cta_text %}{% translate "View Invitation" %}{% endblock %}

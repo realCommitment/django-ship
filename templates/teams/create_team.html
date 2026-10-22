@@ -1,0 +1,15 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+{% load form_tags %}
+{% block app %}
+  <section class="app-card">
+    <h1 class="text-2xl font-bold mb-4">{% blocktranslate with label=team_label|lower %}New {{ label }}{% endblocktranslate %}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {% render_form_fields form %}
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">{% translate "Create" %}</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}

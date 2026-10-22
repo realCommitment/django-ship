@@ -1,0 +1,82 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+{% block app %}
+  <section class="app-card">
+    {% include "teams/components/team_tabs.html" %}
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-xl font-bold">{% translate "Members" %}</h2>
+      {% if request.membership.is_admin %}
+        <a href="{% url 'teams:invite' request.team.slug %}" class="btn btn-primary btn-sm">{% translate "Invite someone" %}</a>
+      {% endif %}
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>{% translate "Member" %}</th>
+            <th>{% translate "Role" %}</th>
+            {% if request.membership.is_admin %}<th></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for membership in memberships %}
+            <tr>
+              <td>{{ membership.user.get_display_name }}{% if membership.user == user %} <span class="badge badge-ghost">{% translate "you" %}</span>{% endif %}</td>
+              <td>
+                {% if request.membership.is_admin %}
+                  <form method="post" action="{% url 'teams:change_role' request.team.slug membership.pk %}" class="flex gap-2">
+                    {% csrf_token %}
+                    <select name="role" class="select select-sm" aria-label="{% translate 'Role' %}">
+                      {% for value, label in roles %}
+                        <option value="{{ value }}" {% if value == membership.role %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm">{% translate "Change role" %}</button>
+                  </form>
+                {% else %}
+                  {{ membership.get_role_display }}
+                {% endif %}
+              </td>
+              {% if request.membership.is_admin %}
+                <td class="text-right">
+                  {% if membership.user != user %}
+                    <form method="post" action="{% url 'teams:remove_member' request.team.slug membership.pk %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-error btn-outline">{% translate "Remove" %}</button>
+                    </form>
+                  {% endif %}
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if request.membership.is_admin and invitations %}
+      <h2 class="text-xl font-bold mt-6 mb-2">{% translate "Pending invitations" %}</h2>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <tbody>
+            {% for invitation in invitations %}
+              <tr>
+                <td>{{ invitation.email }}</td>
+                <td>{{ invitation.get_role_display }}</td>
+                <td>{% if invitation.is_expired %}<span class="badge badge-warning">{% translate "expired" %}</span>{% endif %}</td>
+                <td class="text-right">
+                  <form method="post" action="{% url 'teams:revoke' request.team.slug invitation.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-ghost">{% translate "Revoke" %}</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+    <form method="post" action="{% url 'teams:leave' request.team.slug %}" class="mt-6">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-error btn-outline">{% blocktranslate with label=team_label|lower %}Leave this {{ label }}{% endblocktranslate %}</button>
+    </form>
+  </section>
+{% endblock %}

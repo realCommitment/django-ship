@@ -1,0 +1,47 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+{% block app %}
+  <section class="app-card">
+    {% include "teams/components/team_tabs.html" %}
+    <h2 class="text-xl font-bold mb-2">{% translate "Billing" %}</h2>
+    {% if processing %}
+      <div role="status" class="alert alert-info mb-4">
+        {% translate "Thanks! Stripe is processing your payment. Your plan appears here in a moment; refresh the page." %}
+      </div>
+    {% endif %}
+    {% if subscription %}
+      <dl class="mb-4">
+        <dt class="font-bold">{% translate "Plan" %}</dt>
+        <dd>{{ plan.name|default:"-" }}</dd>
+        <dt class="font-bold">{% translate "Status" %}</dt>
+        <dd>{{ subscription.status }}</dd>
+        {% if subscription.status == "trialing" %}
+          <dt class="font-bold">{% translate "Trial ends" %}</dt>
+          <dd>{{ subscription.trial_end|date }}</dd>
+        {% endif %}
+      </dl>
+    {% else %}
+      <p class="mb-4">{% translate "Free plan" %}</p>
+    {% endif %}
+    {% if request.team.stripe_customer %}
+      <form method="post" action="{% url 'billing:portal' request.team.slug %}" class="mb-4">
+        {% csrf_token %}
+        <button type="submit" class="btn">{% translate "Manage billing" %}</button>
+      </form>
+    {% endif %}
+    {% if prices %}
+      <h3 class="text-lg font-bold mb-2">{% translate "Plans" %}</h3>
+      <div class="flex flex-wrap gap-4">
+        {% for price in prices %}
+          <form method="post" action="{% url 'billing:checkout' request.team.slug %}" class="card bg-base-200 p-4">
+            {% csrf_token %}
+            <input type="hidden" name="price" value="{{ price.id }}">
+            <div class="font-bold">{{ price.product.name }}</div>
+            <div class="mb-2">{{ price.human_readable_price }}</div>
+            <button type="submit" class="btn btn-primary btn-sm">{% translate "Choose" %}</button>
+          </form>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

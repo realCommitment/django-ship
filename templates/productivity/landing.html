@@ -1,0 +1,20 @@
+{% extends "web/base.html" %}
+{% load i18n %}
+{% load django_vite %}
+{% block body %}
+  <section class="hero min-h-[60vh] bg-base-200">
+    <div class="hero-content text-center">
+      <div class="max-w-2xl">
+        <h1 class="text-5xl font-bold">{% translate "Get your work done" %}</h1>
+        <p class="py-6 text-lg">{{ project_meta.DESCRIPTION }}</p>
+        <a href="{% url 'account_signup' %}" class="btn btn-primary">{% translate "Start planning" %}</a>
+        <a href="{% url 'account_login' %}" class="btn">{% translate "Sign in" %}</a>
+        <div class="mt-10" data-island="TodayList" data-props='{"limit": 3}'></div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+{% block page_js %}
+  {% vite_react_refresh %}
+  {% vite_asset 'assets/javascript/islands.tsx' %}
+{% endblock page_js %}

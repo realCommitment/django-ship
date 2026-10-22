@@ -1,0 +1,120 @@
+name: Run Django Tests
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  code-style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.14
+      - name: Run pre-commit hooks
+        uses: pre-commit/action@v3.0.0
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.9.17"
+          enable-cache: true
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.14
+      - name: Install Dependencies
+        run: |
+          uv sync --frozen
+      - name: Run Type Checking
+        run: |
+          uv run mypy .
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version:
+          - '3.14'
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.9.17"
+          enable-cache: true
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          uv sync --frozen
+
+      - name: Run Tests
+        env:
+          DJANGO_DATABASE_USER: postgres
+          DJANGO_DATABASE_PASSWORD: postgres_password
+        run: |
+          uv run manage.py test
+
+      - name: Check production settings
+        env:
+          DJANGO_SETTINGS_MODULE: project.settings_production
+          SECRET_KEY: ci-only-not-a-secret-0123456789-abcdefghijklmnopqrstuvwxyz
+          ALLOWED_HOSTS: example.com
+          ADMINS: admin@example.com
+          DEFAULT_FROM_EMAIL: hello@example.com
+          SERVER_EMAIL: noreply@example.com
+          DIRECTORY_DOMAIN: directory.example.com
+          DIRECTORY_FROM_EMAIL: hello@directory.example.com
+          PRODUCTIVITY_DOMAIN: productivity.example.com
+          PRODUCTIVITY_FROM_EMAIL: hello@productivity.example.com
+          STRIPE_LIVE_MODE: "False"
+          STRIPE_TEST_SECRET_KEY: sk_test_ci_only_not_a_real_key_0123456789
+          DIRECTORY_STRIPE_PORTAL_CONFIGURATION: bpc_ci_only_directory
+          PRODUCTIVITY_STRIPE_PORTAL_CONFIGURATION: bpc_ci_only_productivity
+          AWS_STORAGE_BUCKET_NAME: ci-only-bucket
+          AWS_ACCESS_KEY_ID: ci-only-key
+          AWS_SECRET_ACCESS_KEY: ci-only-secret
+          AWS_S3_ENDPOINT_URL: https://t3.storageapi.dev
+          AWS_S3_REGION_NAME: auto
+        run: |
+          uv run manage.py check --deploy --fail-level WARNING
+  docker:
+    # Railway builds this Dockerfile; a broken image fails the checks here instead of at deploy time.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the production image
+        run: docker build .

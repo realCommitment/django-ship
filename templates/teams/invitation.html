@@ -1,0 +1,19 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+{% block app %}
+  <section class="app-card">
+    <div class="text-sm text-base-content/70">{{ team_label }}</div>
+    <h1 class="text-3xl font-bold mb-2">{{ invitation.team.name }}</h1>
+    {% if error %}
+      <div class="alert alert-error alert-soft" role="alert">{{ error }}</div>
+    {% else %}
+      <p class="mb-4">
+        {% blocktranslate with inviter=invitation.invited_by.get_display_name role=invitation.get_role_display label=team_label|lower %}{{ inviter }} invited you to join this {{ label }} with the role {{ role }}.{% endblocktranslate %}
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">{% translate "Accept invitation" %}</button>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}

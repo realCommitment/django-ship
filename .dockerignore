@@ -1,0 +1,18 @@
+.git
+media
+static_root
+node_modules
+npm-debug.log
+**/.env
+venv
+.venv
+.direnv
+.pytest_cache
+# built by the frontend stage of the Dockerfile
+static/assets
+static/css
+static/js
+static/.vite
+docs
+__pycache__
+*.pyc

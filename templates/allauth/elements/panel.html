@@ -1,0 +1,15 @@
+{% load allauth %}
+<section class="mt-4">
+    {# A plain h2: a title slot nested in the h2 element fills that element's slot and renders empty. #}
+    <h2 class="text-xl mb-1">
+        {% slot title %}
+        {% endslot %}
+    </h2>
+    {% slot body %}
+    {% endslot %}
+    {% if slots.actions %}
+      <div class="mt-2 flex space-x-1">
+        {% for action in slots.actions %}{{ action }}{% endfor %}
+      </div>
+    {% endif %}
+</section>

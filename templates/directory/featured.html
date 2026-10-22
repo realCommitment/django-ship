@@ -1,0 +1,9 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+{% block app %}
+  <section class="app-card">
+    {% include "teams/components/team_tabs.html" %}
+    <h2 class="text-xl font-bold mb-2">{% translate "Featured listing" %}</h2>
+    <p>{% translate "Your plan includes a featured listing." %}</p>
+  </section>
+{% endblock %}

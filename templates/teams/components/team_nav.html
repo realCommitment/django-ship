@@ -1,0 +1,22 @@
+{% load i18n %}
+{% if not user.is_anonymous %}
+  <li class="menu-title">
+    <span>{{ team_label }}</span>
+  </li>
+  <ul class="menu-list">
+    {% for team in user_teams %}
+      <li>
+        <a href="{{ team.get_absolute_url }}" {% if request.team.pk == team.pk %}class="menu-active"{% endif %}>
+          <i class="fa fa-users h-4 w-4"></i>
+          {{ team.name }}
+        </a>
+      </li>
+    {% endfor %}
+    <li>
+      <a href="{% url 'teams:create' %}" {% if active_tab == 'create_team' %}class="menu-active"{% endif %}>
+        <i class="fa fa-plus h-4 w-4"></i>
+        {% blocktranslate with label=team_label|lower %}New {{ label }}{% endblocktranslate %}
+      </a>
+    </li>
+  </ul>
+{% endif %}

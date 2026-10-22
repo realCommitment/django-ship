@@ -1,0 +1,9 @@
+[tools]
+python = "3.14"
+node = "24"
+uv = "latest"
+
+[env]
+_.python.venv = { path = ".venv", create = true }
+# Exposes this checkout's DATABASE_URL and ports (written by scripts/setup-worktree.sh) to tools such as .mcp.json.
+_.file = ".env"

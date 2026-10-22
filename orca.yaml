@@ -1,0 +1,9 @@
+scripts:
+  setup: |
+    export PATH="$HOME/.local/bin:$PATH"
+    mise trust
+    mise install
+    mise exec -- ./scripts/setup-worktree.sh
+  archive: |
+    docker compose -p "$(basename "$PWD")" down -v
+setupAgentStartupPolicy: wait-for-setup

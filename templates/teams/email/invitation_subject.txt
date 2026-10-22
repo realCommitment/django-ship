@@ -1,0 +1,1 @@
+{% load i18n %}{% autoescape off %}[{{ site_name }}] {% blocktranslate with team_name=team.name %}You're invited to join {{ team_name }}{% endblocktranslate %}{% endautoescape %}

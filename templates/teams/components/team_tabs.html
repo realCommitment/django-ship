@@ -1,0 +1,14 @@
+{% load i18n %}
+<div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+  <div>
+    <div class="text-sm text-base-content/70">{{ team_label }}</div>
+    <h1 class="text-3xl font-bold">{{ request.team.name }}</h1>
+  </div>
+  <div role="tablist" class="tabs tabs-box">
+    <a role="tab" class="tab {% if active_tab == 'team_home' %}tab-active{% endif %}" href="{% url 'teams:home' request.team.slug %}">{% translate "Home" %}</a>
+    <a role="tab" class="tab {% if active_tab == 'team_members' %}tab-active{% endif %}" href="{% url 'teams:members' request.team.slug %}">{% translate "Members" %}</a>
+    {% if request.membership.is_admin %}
+      <a role="tab" class="tab {% if active_tab == 'team_billing' %}tab-active{% endif %}" href="{% url 'billing:billing' request.team.slug %}">{% translate "Billing" %}</a>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,14 @@
+{% extends "web/base.html" %}
+{% load i18n %}
+{% block body %}
+  <section class="hero min-h-[60vh] bg-base-200">
+    <div class="hero-content text-center">
+      <div class="max-w-2xl">
+        <h1 class="text-5xl font-bold">{% translate "Find the right local business" %}</h1>
+        <p class="py-6 text-lg">{{ project_meta.DESCRIPTION }}</p>
+        <a href="{% url 'account_signup' %}" class="btn btn-primary">{% translate "List your business" %}</a>
+        <a href="{% url 'account_login' %}" class="btn">{% translate "Sign in" %}</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}

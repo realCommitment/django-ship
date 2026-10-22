@@ -1,0 +1,5 @@
+{% load i18n %}{% autoescape off %}{% blocktranslate with inviter=invitation.invited_by.get_display_name team_name=team.name label=team_label|lower role=invitation.get_role_display %}{{ inviter }} invited you to join the {{ label }} {{ team_name }} on {{ site_name }} with the role {{ role }}.{% endblocktranslate %}
+
+{% translate "Accept the invitation here:" %}
+{{ invitation_url }}
+{% endautoescape %}
